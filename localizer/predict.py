@@ -9,7 +9,7 @@ import cv2
 import tensorflow as tf
 from tensorflow import keras
 
-from localizer import utils
+from ..localizer import utils
 
 
 class Object:
@@ -112,8 +112,6 @@ class Localizer:
 
         color_channels = image_shape[2] if len(image_shape) > 2 else 1
         self._model_input_shape = tuple(input_size) + (color_channels,)
-
-        self._create_model()
 
         # Transform to convert from image to input.
         self._input_t_image = utils.make_transform2(self._input_scale)
@@ -294,7 +292,9 @@ class Localizer:
                 ),
             )
 
-        self._update_input_image_parameters(image.shape)
+        if self._image_shape != image.shape:
+            self._update_input_image_parameters(image.shape)
+            self._create_model()  # TODO: load model before predict
 
         batch_size = 1
 
